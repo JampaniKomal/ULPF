@@ -28,6 +28,33 @@ addresses, is never measured, and never appears in a published number.
 
 ---
 
+## Evaluating this project
+
+If you are assessing this submission, start with
+**[docs/EVALUATION-GUIDE.md](docs/EVALUATION-GUIDE.md)**. It is written for an
+evaluator with a laptop and forty minutes: what to run, what you should see,
+and — more usefully — six ways to try to catch us out, each with the command
+and the output it produces.
+
+| | |
+|---|---|
+| [EVALUATION-GUIDE.md](docs/EVALUATION-GUIDE.md) | Verify every claim yourself, including how to attack them |
+| [FEATURES.md](docs/FEATURES.md) | Complete feature catalogue, mapped to requirements (a)–(k) |
+| [DATASET-INVENTORY.md](docs/DATASET-INVENTORY.md) | Every corpus, verified record count, provenance |
+| [PROBLEM-STATEMENT.md](docs/PROBLEM-STATEMENT.md) | PS 26156 read closely, clause by clause |
+
+The short version: build, then
+
+```bash
+./target/release/ulpf test --packs packs
+```
+
+```
+35 packs · 78/78 fixtures passed · 100.0% field accuracy
+```
+
+---
+
 ## Contents
 
 - [The problem](#the-problem)
@@ -341,16 +368,23 @@ available, and vendoring them would silently relicense third-party data.
 python tools/fetch_datasets.py
 ```
 
-This fetches **every** corpus the coverage table is measured on, into
+This fetches **exactly** the corpora the coverage table is measured on, into
 `realdata`: the Honeynet Project captures (Scan of the Month 30 and 34, the
-Dragon NIDS capture, Squid, Blue Coat), the MACCDC 2012 Zeek capture, and all
-nineteen corpora in the official Loghub deposit. Roughly 6 GB of archives
-expanding to roughly 65 GB on disk, so check the volume has room first.
+Dragon NIDS capture, Squid, Blue Coat), the MACCDC 2012 Zeek capture, and the
+four Loghub corpora the table uses. Roughly **5.6 GB** on disk. After it,
+`python tools/measure_coverage.py` reproduces the whole table in about forty
+minutes.
 
-There is deliberately no size gate. An earlier version defaulted to a ~200 MB
-subset, which meant this command produced a corpus set the published table
-could not be measured on. Completed files are skipped and partial transfers
-resume, so an interrupted fetch restarts by running the same command again.
+The default is tied to the measured set rather than to a size limit, so the
+two cannot drift apart — an earlier version defaulted to a ~200 MB subset the
+published table could not be measured on. Completed files are skipped and
+partial transfers resume, so an interrupted fetch restarts by running the same
+command again.
+
+`--all` additionally fetches the fifteen Loghub corpora outside the perimeter
+scope (Thunderbird, Windows, HDFS, Spark, Android and the rest) — about 86 GB
+more. **No published figure in this project is measured on any of them**, and
+they are not needed to verify anything.
 
 See [docs/DATASETS.md](docs/DATASETS.md) for full provenance.
 
@@ -550,11 +584,11 @@ figure comes from unmodified public capture data; nothing here is synthesised.
 | Host | `linux-messages.log` | Honeynet SotM34 | 1,166 | 99.1424% |
 | Host | `Linux.full.log` | Loghub, full corpus | 25,567 | 99.8905% |
 | Mail | `sendmail.log` | Honeynet SotM34 | 1,172 | 99.3174% |
-| Proxy | `Proxifier.full.log` | Loghub, full corpus | 21,329 | 79.6756% |
+| Proxy | `Proxifier.full.log` | Loghub, full corpus | 21,329 | 99.9391% |
 | Proxy | `squid-access.log` | Honeynet | 533,197 | 99.9771% |
 | Proxy | `bluecoat-proxy.log` | Honeynet, full capture | 8,130,590 | 99.8033% |
 | Network | `zeek-conn-full.log` | secrepo MACCDC 2012, full | 22,694,356 | 99.9435% |
-| **Total** | | | **32,414,250** | **99.8834%** |
+| **Total** | | | **32,414,250** | **99.8967%** |
 
 **Four of these rows used to be 2,000-line samples.** Apache, OpenSSH, Linux
 and Proxifier were scored on Loghub's excerpts while the complete corpora sat
@@ -620,7 +654,7 @@ rate is measured on precisely because it is the largest.
 | f | Unified visibility | **Done** | The embedded console: live table naming which pack claimed each record, a source breakdown, cluster browser, event inspector |
 | g | SIEM / data-lake integration | **Done** | NDJSON default; `--parquet`, `--features`, `--opensearch`, `--splunk-hec`, and `--forward-udp` for a SIEM already listening on syslog |
 | h | AI/ML-ready analytics | **Done** | `--features` writes a Hive-partitioned Parquet table with a fixed 24-column contract, version stamped in the footer. Readable by pyarrow, DuckDB and Spark |
-| i | Reduce parser development effort | **Done** | `ulpf profile` then `ulpf draft` on an unseen device: 0% to 100% coverage over 40,000 records with no hand-written parser. Deterministic, no model required |
+| i | Reduce parser development effort | **Done** | `ulpf profile` then `ulpf draft` on an unseen device: 0% to 100% coverage over 50,000 records with no hand-written parser. Deterministic, no model required |
 | j | Air-gapped deployment — **shall** | **Done** | No runtime network dependency on any path; console assets compiled into the binary. CI runs every build and test step `--offline`, which fails outright if Cargo would reach the network |
 | k | Containerized deployment — *may* | **Done** | Two-stage build onto distroless, read-only rootfs, all capabilities dropped. `deploy/demo-compose.yaml` brings ULPF and a SIEM up together in one command |
 
@@ -668,7 +702,7 @@ review-and-approve gate; provenance recorded on generated packs.
 vault, assistant, deep-linkable views, and a simulator that drives ten real
 corpora.
 
-**Evidence.** 32,414,250 real perimeter records at 99.8834% coverage; throughput measured
+**Evidence.** 32,414,250 real perimeter records at 99.8967% coverage; throughput measured
 and published with its losses; scripts to reproduce both.
 
 ---
@@ -687,9 +721,11 @@ consumes several chains at once.
 
 ### 2. Widen real-corpus coverage
 
-The three named gaps are Proxifier's non-connection lines (18.9%), the daemon
-long tail in Linux syslog, and mail. Each needs packs written against the
-capture rather than against a vendor manual.
+The two named gaps are the daemon long tail in Linux syslog and mail, each of
+which needs packs written against the capture rather than against a vendor
+manual. (Proxifier used to be listed here at 18.9%; the shortfall turned out to
+be a detector bug rather than a design decision, and the corpus now scores
+99.9391% — see [docs/DATASETS.md](docs/DATASETS.md).)
 
 Cisco ASA, FortiGate, Palo Alto, Check Point, Juniper, Suricata, ModSecurity,
 Squid and the generic CEF fallback exist and pass their fixtures, but those
@@ -740,7 +776,7 @@ Stated plainly, because a reviewer will find them anyway.
   day, and this project does not claim it has. Over UDP the lossless ceiling is
   8,000 EPS, below the 11,574 the target needs, because that path is bounded by
   the socket rather than the pipeline.
-- **Coverage is 99.8834%, not 100%.** The remainder is enumerated in
+- **Coverage is 99.8967%, not 100%.** The remainder is enumerated in
   `docs/DATASETS.md`. Unparsed records are still vaulted, fingerprinted and
   emitted.
 - **Three of the 35 packs have no real-corpus evidence.** Generic CEF,
@@ -837,6 +873,9 @@ traffic, let the console draft a candidate for you and edit from there —
 
 | Document | Contents |
 |---|---|
+| **[EVALUATION-GUIDE.md](docs/EVALUATION-GUIDE.md)** | **For evaluators: verify every claim, and how to attack them** |
+| **[FEATURES.md](docs/FEATURES.md)** | **Complete feature catalogue, mapped to requirements (a)–(k)** |
+| **[DATASET-INVENTORY.md](docs/DATASET-INVENTORY.md)** | **Every corpus, verified record count, provenance** |
 | [DEMO.md](docs/DEMO.md) | The single-laptop demonstration, start to finish |
 | [DEMO-VIDEO-SCRIPT.md](docs/DEMO-VIDEO-SCRIPT.md) | Shot list and narration for the two-minute video |
 | [SLIDE-CONTENT.md](docs/SLIDE-CONTENT.md) | Content for the five-slide technical presentation |

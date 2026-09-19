@@ -97,7 +97,7 @@ time for only one slide, it is this one.
 | Auth | OpenSSH | Loghub, full | 655,147 | 100.0000% |
 | Proxy | Blue Coat ProxySG | Honeynet | 8,130,590 | 99.8033% |
 | Network | Zeek conn.log | MACCDC 2012, full | 22,694,356 | 99.9435% |
-| **Perimeter total** | | | **32,414,250** | **99.8834%** |
+| **Perimeter total** | | | **32,414,250** | **99.8967%** |
 
 *Thirteen sources in total; five shown. The full table is in the README.*
 
@@ -153,7 +153,7 @@ that proves it:
 - One collector does not reach one billion events per day. 8,000 EPS is 69% of
   the target; reaching it is a second collector, which the architecture already
   allows because chains are per-collector.
-- Coverage is 99.8834%, not 100%. The remainder is enumerated by name —
+- Coverage is 99.8967%, not 100%. The remainder is enumerated by name —
   Proxifier's non-connection lines, and 4,478 Apache lines that carry no
   timestamp at all.
 - Five Loghub corpora totalling 375 million records are held on disk and have

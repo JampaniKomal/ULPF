@@ -44,11 +44,11 @@ non-perimeter source move the headline number.
 | Host | `linux-messages.log` | Honeynet SotM34 | 1,166 | 99.1424% |
 | Host | `Linux.full.log` | Loghub, full corpus | 25,567 | 99.8905% |
 | Mail | `sendmail.log` | Honeynet SotM34 | 1,172 | 99.3174% |
-| Proxy | `Proxifier.full.log` | Loghub, full corpus | 21,329 | 79.6756% |
+| Proxy | `Proxifier.full.log` | Loghub, full corpus | 21,329 | 99.9391% |
 | Proxy | `squid-access.log` | Honeynet | 533,197 | 99.9771% |
 | Proxy | `bluecoat-proxy.log` | Honeynet, full capture | 8,130,590 | 99.8033% |
 | Network | `zeek-conn-full.log` | SecRepo (MACCDC 2012), full | 22,694,356 | 99.9435% |
-| **Total** | | | **32,414,250** | **99.8834%** |
+| **Total** | | | **32,414,250** | **99.8967%** |
 
 Every figure above, including the aggregate, comes from one run of
 `python tools/measure_coverage.py --set perimeter` on the corpora as fetched.
@@ -68,19 +68,18 @@ client. That is an artifact of the corpus rather than a defect in the pack,
 and ULPF declines to invent fields a record does not carry — those lines are
 still vaulted, fingerprinted and searchable as Base Event.
 
-`zeek-conn.log` is counted in the total above — it has been fetched and
-measured, unlike Blue Coat, which has not (see note). Both are `OPTIONAL_CORPORA`
-in `tools/measure_coverage.py`: counted when present, silently excluded from
-the denominator when absent, so the total above is exactly what
-`python tools/measure_coverage.py` prints right now, not a fixed constant.
+Every corpus in the table above has been fetched and measured end to end.
+`tools/measure_coverage.py` reports a corpus that is absent rather than
+silently dropping it from the denominator, so the total is exactly what the
+command prints on a machine with the full set, not a fixed constant.
 
 **Blue Coat note.** The ProxySG capture is 8,130,590 records and ~2.6 GB
-extracted, so it sits in the `large` tier rather than `standard`: putting it in
-`standard` exhausted the disk on a GitHub-hosted runner and the coverage
-workflow died mid-fetch. Fetch it with
-`python tools/fetch_datasets.py --tier large`.
+extracted — the largest single download in the default set, and the corpus the
+file-ingest throughput figure is measured on. It is fetched by default; on a
+machine short of disk, `--no-bluecoat` skips it, at the cost of no longer being
+able to reproduce the full table.
 
-The full file has now been run end to end: **8,130,590 records at 99.8033%**,
+The full file has been run end to end: **8,130,590 records at 99.8033%**,
 and it is in the table above rather than in a footnote. Earlier revisions of
 this document quoted a 398,380-record prefix at 99.0148% and excluded the
 corpus from the total, because quoting a prefix as if it were the whole file
@@ -112,8 +111,11 @@ it. The whole capture is now fetched and measured: **22,694,356 records at
 
 ### Sources outside the Current Scope sentence
 
-Measured on the Loghub 2,000-line excerpts. Full corpora — up to 211 million
-lines — are fetched with `--tier large` or `--tier xl`.
+**These are not part of the headline figure and are not evidence for it.**
+They are measured on the Loghub 2,000-line excerpts, which
+`tools/fetch_datasets.py` fetches by default because they are 4 MB in total.
+The full corpora are opt-in behind `--all`; nothing this project claims is
+measured on them.
 
 | Category | Source | Records | Coverage |
 |---|---|---:|---:|
@@ -164,17 +166,20 @@ the vendor manual, and the corpus's own `#Fields:` header showed the manual
 was wrong in two places, so the documentation-derived pattern matched none of
 the 8.1 million records.
 
-## Held on disk, not yet run end to end
+## Outside the measured set
 
-Fetching every corpus is not the same as having measured every corpus, and
-this section exists so the difference is stated rather than left for a reader
-to discover.
+Fetching a corpus is not the same as having measured it, and this section
+exists so the difference is stated rather than left for a reader to discover.
 
-`tools/fetch_datasets.py` retrieves all nineteen archives in the Loghub
-deposit. Five of them are far larger than anything in the coverage tables
-above, and they have **not** been run through the pipeline. They are on disk,
-they are real, and they are available to anyone who wants to reproduce a run
-over them — but no figure in this project is measured on them.
+The Loghub deposit holds nineteen archives. **Four are in the measured
+perimeter set** (Apache, Linux, OpenSSH, Proxifier) and are fetched by default.
+The other fifteen are opt-in behind `--all`, because no figure in this project
+is measured on any of them and they add roughly 86 GB.
+
+The five largest are listed below so their cost is visible. They have **not**
+been run through the pipeline. They are real and anyone may reproduce a run
+over them — but nothing this project claims rests on them, and we do not cite
+them as evidence.
 
 | Corpus | What it is | Records | On disk | Estimated run |
 |---|---|---:|---:|---:|

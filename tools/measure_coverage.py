@@ -187,11 +187,14 @@ def main() -> None:
     parser.add_argument(
         "--set",
         choices=["all", "perimeter", "universal"],
-        default="all",
+        default="perimeter",
         help=(
-            "which corpora to measure. 'perimeter' is the set the headline "
-            "figure answers and finishes in minutes; 'all' includes corpora "
-            "of hundreds of millions of records and takes hours"
+            "which corpora to measure. The default, 'perimeter', is the set "
+            "the headline figure answers and the set tools/fetch_datasets.py "
+            "retrieves by default; it finishes in about forty minutes. "
+            "'universal' is everything outside the problem statement's "
+            "Current Scope sentence, and 'all' is both -- hundreds of "
+            "millions of records, and hours"
         ),
     )
     parser.add_argument(

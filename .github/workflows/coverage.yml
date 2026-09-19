@@ -121,7 +121,7 @@ jobs:
     # still stop claiming most of the traffic it used to.
     - name: Check coverage against the baseline
       if: steps.fetch.outcome == 'success'
-      run: python tools/measure_coverage.py --data realdata --check
+      run: python tools/measure_coverage.py --data realdata --set all --check
 
     # Reached only when a third-party mirror was unreachable twice. Going red
     # here would be indistinguishable from a real regression, and a job that is
@@ -136,7 +136,7 @@ jobs:
 
     - name: Upload the measured table
       if: always()
-      run: python tools/measure_coverage.py --data realdata | tee coverage.txt
+      run: python tools/measure_coverage.py --data realdata --set all | tee coverage.txt
 
     - uses: actions/upload-artifact@v4
       if: always()

@@ -57,21 +57,37 @@ edge services sitting behind them.
 
 **Why this matters in practice.** Breadth is cheap to claim and expensive to
 prove. A submission with forty half-working packs spanning IoT and Kubernetes
-reads worse than one with eighteen perimeter packs measured against real
+reads worse than one with a smaller set of perimeter packs measured against real
 traffic, because the second one is what was asked for. Effort spent outside the
 perimeter is effort not spent on evidence inside it.
 
-**How our own coverage maps onto it.** Of the eighteen Source Packs we ship,
-fifteen are perimeter or edge devices — firewalls and VPN (Check Point, Cisco
-ASA, FortiGate, Juniper SRX, PAN-OS, iptables), network IDS (Snort, Suricata,
-Enterasys Dragon), WAF (ModSecurity), proxies (Squid, Proxifier), the edge web
-server (Apache access and error), and a generic CEF fallback for perimeter
-appliances we have no specific pack for. Three are host or service sources
-rather than perimeter devices: `linux-syslog-host`, `openssh-auth` and
-`sendmail-mta`. We keep those deliberately — they demonstrate that the
-framework is not perimeter-*only*, which is what "universal" in the title
-requires — but they are outside the Current Scope sentence and we do not count
-them as answering it.
+**How our own coverage maps onto it.** Of the thirty-five Source Packs we ship,
+**nineteen are perimeter, edge or network devices**: firewalls and VPN (Check
+Point ×2, Cisco ASA, FortiGate, Juniper SRX, PAN-OS, iptables, pfSense),
+network IDS (Snort, Suricata, Enterasys Dragon), WAF (ModSecurity), proxies
+(Squid, Blue Coat, Proxifier), the edge web server (Apache access and error),
+network flow (Zeek `conn.log`), and a generic CEF fallback for perimeter
+appliances we have no specific pack for.
+
+**Five are host, auth or mail sources** sitting immediately behind the
+perimeter: `linux-syslog-host`, `openssh-auth`, `sendmail-mta`,
+`macos-system-syslog` and `windows-cbs-servicing`.
+
+**Eleven are outside the perimeter altogether** — big data (HDFS, Hadoop YARN,
+Spark, ZooKeeper), HPC (Blue Gene/L RAS, Thunderbird, HPC node state), cloud
+(OpenStack Nova ×2) and mobile (Android logcat, HealthApp).
+
+We keep the last two groups deliberately: they demonstrate that the framework
+is not perimeter-*only*, which is what "universal" in the title requires, and
+several of them are where the framework's hardest parsing lessons came from
+(see the *What real data changed* table in [DATASETS.md](DATASETS.md)). But
+they are outside the Current Scope sentence, **they are not measured, and we do
+not count them as answering it.**
+
+The headline figure — 32,414,250 records at 99.8967% — is the perimeter set
+alone. The split is enforced in `tools/measure_coverage.py`, which reports the
+two sets separately so that adding a non-perimeter source can never quietly
+move the number that answers the statement.
 
 ## 3. The demand, in one paragraph
 

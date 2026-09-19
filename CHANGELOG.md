@@ -23,7 +23,7 @@ Figures quoted here are reproducible from the repository — see
   snapshot.
 - Ten decoders: RFC 3164 and RFC 5424 syslog, CEF, LEEF, JSON, XML, CSV,
   key-value, and regex.
-- Thirty-five declarative Source Packs, 75 fixtures, 100% field accuracy.
+- Thirty-five declarative Source Packs, 78 fixtures, 100% field accuracy.
 - Coverage measured over real perimeter capture data with the misses
   enumerated rather than rounded away. Reproduce the current figure with
   `python tools/measure_coverage.py --set perimeter`; corpora outside the

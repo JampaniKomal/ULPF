@@ -5,21 +5,29 @@ Nothing here is generated. Every file comes from a public research dataset and
 is used byte-for-byte as published, so the figures in docs/DATASETS.md can be
 reproduced independently.
 
-    python tools/fetch_datasets.py                  # everything
+    python tools/fetch_datasets.py                  # the measured set, ~5.6 GB
     python tools/fetch_datasets.py --dir D:/corpora # somewhere with room
+    python tools/fetch_datasets.py --all            # + 86 GB of unmeasured corpora
     python tools/fetch_datasets.py --only Apache    # resume one corpus
 
-**This fetches every corpus, with no tiering and no size gate.** Roughly 6 GB
-of archives expanding to roughly 65 GB on disk. Make sure the target volume
-has the room before starting.
+**The default is exactly the corpora the published figure is measured on** --
+the thirteen in `PERIMETER` in tools/measure_coverage.py, plus the 2,000-line
+Loghub samples and the SotM30 cross-validation capture. Roughly 5.6 GB. After
+this, `python tools/measure_coverage.py` reproduces the headline table in about
+forty minutes on an ordinary laptop.
 
-That is a deliberate change. The previous version defaulted to a ~200 MB
-"standard" tier, and the two largest tiers were opt-in — which meant the
-command in the README produced a corpus set the published coverage table could
-not actually be measured on. Four perimeter sources the headline figure is
-measured on (Apache, Linux, Proxifier, OpenSSH) had no full-corpus entry at
-all and were only ever scored on their 2,000-line samples, while the complete
-corpora sat unused in the same Zenodo deposit.
+The default must stay tied to what the published table needs. An earlier
+version defaulted to a ~200 MB "standard" tier while the full corpora for four
+perimeter sources (Apache, Linux, Proxifier, OpenSSH) sat unfetched in the same
+Zenodo deposit -- so the command in the README produced a corpus set the
+published table could not be measured on. Fetching *everything* fixed that and
+introduced the opposite problem: 92 GB and ten hours of pipeline time, 86 GB of
+which no published figure uses. Both failures are the same mistake, which is
+letting the download set drift away from the measured set.
+
+`--all` adds the fifteen corpora outside the Current Scope sentence. They are
+genuinely interesting -- Thunderbird is 211 million records -- but nothing this
+project claims is measured on them, and they are not needed to check any of it.
 
 Every completed file is skipped on a rerun and every partial transfer resumes
 with an HTTP Range request, so an interrupted fetch is restarted by running
@@ -80,13 +88,15 @@ ZENODO_FALLBACKS = {
 #       print([e['key'] for e in json.load(urllib.request.urlopen(
 #       'https://zenodo.org/api/records/8196385/files'))['entries']])"
 #
-# There is deliberately no tiering. An earlier version split these into
-# `large` and `xl` and defaulted to neither, which meant the default fetch
-# silently produced a corpus set the coverage table could not be measured on.
-# Worse, four perimeter sources the headline figure is measured on — Apache,
-# Linux, Proxifier and OpenSSH — had no full entry here at all, so they were
-# only ever measured on their 2,000-line samples while the complete corpora
-# sat unused in the same deposit.
+# The default selection is PERIMETER_ARCHIVES below, not a size tier. An
+# earlier version split this list into `large` and `xl` and defaulted to
+# neither, which meant the default fetch silently produced a corpus set the
+# coverage table could not be measured on — four perimeter sources (Apache,
+# Linux, Proxifier, OpenSSH) had no full entry here at all and were only ever
+# measured on their 2,000-line samples. Selecting by *what is measured* rather
+# than by size cannot drift that way: adding a corpus to `PERIMETER` in
+# measure_coverage.py and forgetting it here makes the fetch visibly
+# incomplete rather than quietly wrong.
 #
 # (archive name, output stem, extracted size, published line count)
 LOGHUB_FULL = [
@@ -114,6 +124,22 @@ LOGHUB_FULL = [
     ("Windows.tar.gz", "Windows", "26.1 GB", "114,608,388"),
     ("Thunderbird.tar.gz", "Thunderbird", "29.6 GB", "211,212,192"),
 ]
+
+# The four Loghub archives the published coverage figure is measured on.
+#
+# `PERIMETER` in tools/measure_coverage.py names thirteen corpora; nine come
+# from Honeynet and SecRepo and are fetched unconditionally, and these four are
+# the Loghub contribution. Everything else in LOGHUB_FULL is outside the
+# problem statement's Current Scope sentence, is not measured, and is therefore
+# opt-in behind --all.
+PERIMETER_ARCHIVES = frozenset(
+    {
+        "Apache.tar.gz",
+        "Linux.tar.gz",
+        "SSH.tar.gz",
+        "Proxifier.tar.gz",
+    }
+)
 
 
 def fetch(url: str) -> bytes:
@@ -416,6 +442,46 @@ def secrepo_maccdc_zeek_conn_full(target: pathlib.Path) -> None:
     archive.unlink(missing_ok=True)
 
 
+# Archive members that describe the corpus rather than belonging to it.
+#
+# Several Loghub deposits ship a ground-truth label file beside the logs, and
+# the `.txt` in the extension filter below admits it. `abnormal_label.txt`
+# measurably contaminated two corpora:
+#
+#   * `Hadoop.zip` — 76 lines naming which WordCount/PageRank runs were normal
+#     and which had failures injected. Concatenated ahead of the logs, it made
+#     `Hadoop.full.log` 394,384 lines against Loghub's published 394,308.
+#     (`README.md` sits in the same archive and was already excluded, because
+#     `.md` is not in the filter — which is why only this one got through.)
+#   * `OpenStack.tar.gz` — six lines naming the VM instances with injected
+#     anomalies. Worse than the line count: its final line has no terminator,
+#     so it fused onto the first real record and produced
+#     `1643649d-...nova-api.log.2017-05-14_21:27:04 ...` — one genuine log
+#     record destroyed, silently.
+#
+# Neither corpus is in the perimeter set, so neither moved the headline
+# coverage figure. They still have no business in a file this project calls
+# unmodified capture data: a reviewer comparing a record count against Loghub's
+# published one finds a discrepancy we cannot explain, and every line of it is
+# junk the pipeline is then scored on. Excluding the label file is also the
+# scientifically correct choice — it is the answer key, not the exam.
+METADATA_MEMBERS = frozenset(
+    {
+        "abnormal_label.txt",
+        "anomaly_label.csv",
+        "readme.md",
+        "readme.txt",
+        "license",
+        "license.txt",
+    }
+)
+
+
+def is_metadata_member(name: str) -> bool:
+    """Whether an archive member describes the corpus instead of being part of it."""
+    return pathlib.PurePosixPath(name).name.lower() in METADATA_MEMBERS
+
+
 def loghub_full(
     target: pathlib.Path,
     skipped: set[str] | None = None,
@@ -468,6 +534,8 @@ def loghub_full(
                             n for n in names if n.endswith((".log", ".txt"))
                         ] or names
                         for name in chosen:
+                            if is_metadata_member(name):
+                                continue
                             with handle.open(name) as stream:
                                 shutil.copyfileobj(stream, output, length=1024 * 1024)
                             wrote_data = True
@@ -475,6 +543,8 @@ def loghub_full(
                     with tarfile.open(archive_path, mode="r:*") as handle:
                         for member in handle.getmembers():
                             if not member.isfile():
+                                continue
+                            if is_metadata_member(member.name):
                                 continue
                             stream = handle.extractfile(member)
                             if stream is not None:
@@ -542,7 +612,7 @@ def main() -> None:
         help=(
             "fetch only these Loghub corpora, by archive or output name, for "
             "example --only Apache --only HDFS_v2; may be supplied more than "
-            "once. Everything else is fetched by default"
+            "once. Overrides the default perimeter selection"
         ),
     )
     parser.add_argument(
@@ -556,6 +626,16 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--all",
+        action="store_true",
+        help=(
+            "also fetch the fifteen corpora outside the perimeter set "
+            "(HDFS, BGL, Thunderbird, Spark, Windows, Android and the rest). "
+            "Roughly 86 GB extra, and no published figure is measured on any "
+            "of them"
+        ),
+    )
+    parser.add_argument(
         "--skip-loghub-full",
         action="store_true",
         help="skip all full Loghub/Zenodo archives while keeping other tier data",
@@ -564,9 +644,9 @@ def main() -> None:
         "--no-bluecoat",
         action="store_true",
         help=(
-            "skip the ~2.6 GB Blue Coat ProxySG capture. It is not in "
-            "tools/coverage_baseline.json, so the regression check does not "
-            "need it, and it is the largest single download that check pulls"
+            "skip the ~2.6 GB Blue Coat ProxySG capture. It IS in the "
+            "measured perimeter set, so skipping it means the coverage table "
+            "cannot be fully reproduced -- use only when disk is short"
         ),
     )
     parser.add_argument(
@@ -574,14 +654,33 @@ def main() -> None:
         action="store_true",
         help=(
             "skip the full ~2.6 GB MACCDC Zeek corpus and keep only the "
-            "bounded prefix"
+            "bounded prefix. The full corpus IS in the measured perimeter "
+            "set, so the table cannot be fully reproduced without it"
         ),
     )
     args = parser.parse_args()
     target = pathlib.Path(args.dir).resolve()
     target.mkdir(parents=True, exist_ok=True)
+
+    # Default to exactly the corpora the published coverage figure is measured
+    # on, plus the 2,000-line Loghub samples and the SotM30 cross-validation
+    # capture. That is ~5.6 GB, and it is everything a reviewer needs to
+    # reproduce every number this project claims.
+    #
+    # The fifteen corpora outside the perimeter set add ~86 GB and no published
+    # figure is measured on any of them -- Thunderbird alone is 211 million
+    # records and roughly four hours of pipeline time. Making them opt-in means
+    # `python tools/fetch_datasets.py` followed by
+    # `python tools/measure_coverage.py` reproduces the headline table on an
+    # ordinary laptop, which is the whole point of shipping the tooling.
+    selected_full = set(args.only) or (None if args.all else PERIMETER_ARCHIVES)
+
     print(f"Target: {target}")
-    print("Fetching every corpus: ~6 GB of archives, ~65 GB extracted.")
+    if args.all:
+        print("Fetching every corpus: ~6 GB of archives, ~92 GB extracted.")
+    else:
+        print("Fetching the perimeter set the coverage figure is measured on:")
+        print("  13 corpora, ~5.6 GB extracted. Add --all for the rest (~86 GB more).")
     print("Completed files are skipped and partial transfers resume.\n")
 
     try:
@@ -603,7 +702,7 @@ def main() -> None:
             full_failures = loghub_full(
                 target,
                 set(args.skip_archive),
-                set(args.only),
+                selected_full,
             )
     except Exception as error:  # noqa: BLE001 - a fetch failure should be legible
         print(f"\nfailed: {error}", file=sys.stderr)
