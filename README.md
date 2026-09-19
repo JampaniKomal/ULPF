@@ -38,6 +38,7 @@ and the output it produces.
 
 | | |
 |---|---|
+| [SUBMISSION.md](docs/SUBMISSION.md) | The five deliverables, and all eleven requirements with the command that checks each |
 | [EVALUATION-GUIDE.md](docs/EVALUATION-GUIDE.md) | Verify every claim yourself, including how to attack them |
 | [FEATURES.md](docs/FEATURES.md) | Complete feature catalogue, mapped to requirements (a)–(k) |
 | [DATASET-INVENTORY.md](docs/DATASET-INVENTORY.md) | Every corpus, verified record count, provenance |
@@ -873,6 +874,7 @@ traffic, let the console draft a candidate for you and edit from there —
 
 | Document | Contents |
 |---|---|
+| **[SUBMISSION.md](docs/SUBMISSION.md)** | **The five deliverables, and the eleven requirements with their checks** |
 | **[EVALUATION-GUIDE.md](docs/EVALUATION-GUIDE.md)** | **For evaluators: verify every claim, and how to attack them** |
 | **[FEATURES.md](docs/FEATURES.md)** | **Complete feature catalogue, mapped to requirements (a)–(k)** |
 | **[DATASET-INVENTORY.md](docs/DATASET-INVENTORY.md)** | **Every corpus, verified record count, provenance** |

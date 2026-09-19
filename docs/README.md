@@ -9,6 +9,7 @@ SIH 2026 · Problem Statement 26156 · NTRO · Blockchain & Cybersecurity
 
 | Document | Read it if you want to |
 |---|---|
+| **[SUBMISSION.md](SUBMISSION.md)** | See the five deliverables against their stated limits, and all eleven requirements with the command that checks each |
 | **[EVALUATION-GUIDE.md](EVALUATION-GUIDE.md)** | Assess this submission. Forty minutes, every claim checkable, including six ways to attack it |
 | [PROBLEM-STATEMENT.md](PROBLEM-STATEMENT.md) | See how we read PS 26156, clause by clause, and where we resolved its ambiguities |
 | [FEATURES.md](FEATURES.md) | See everything the framework does, mapped to requirements (a)–(k) |
