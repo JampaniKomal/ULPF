@@ -674,12 +674,17 @@ crates/
   ulpf-generator   Drain clustering, deterministic generator, LLM client, scorer
   ulpf-cli         binary: run, serve, listen, replay, draft, test, verify, raw
 packs/             35 Source Packs
-schema/ocsf/       vendored OCSF 1.9.0
+schema/ocsf/       vendored OCSF 1.9.0, an unmodified upstream snapshot
+                   (see schema/ocsf/UPSTREAM.md for the commit it pins)
 tools/             corpus fetch, coverage and throughput measurement, schema audit
 deploy/            compose files: the collector, a sharded three-collector
                    deployment, an OpenSearch receiver, and a single-node Wazuh
                    stack for the side-by-side demonstration
-docs/              the demonstration, architecture, datasets, throughput, testing
+scripts/           build and setup helpers for Windows and POSIX
+testdata/          mixed.log - one synthetic sample so the pipeline can be
+                   tried without downloading corpora. Never measured
+docs/              SUBMISSION.md and EVALUATION-GUIDE.md first; then
+                   architecture, datasets, throughput, proofs, testing
 ```
 
 ---
