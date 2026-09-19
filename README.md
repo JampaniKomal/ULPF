@@ -877,9 +877,8 @@ traffic, let the console draft a candidate for you and edit from there —
 | **[FEATURES.md](docs/FEATURES.md)** | **Complete feature catalogue, mapped to requirements (a)–(k)** |
 | **[DATASET-INVENTORY.md](docs/DATASET-INVENTORY.md)** | **Every corpus, verified record count, provenance** |
 | [DEMO.md](docs/DEMO.md) | The single-laptop demonstration, start to finish |
-| [DEMO-VIDEO-SCRIPT.md](docs/DEMO-VIDEO-SCRIPT.md) | Shot list and narration for the two-minute video |
-| [SLIDE-CONTENT.md](docs/SLIDE-CONTENT.md) | Content for the five-slide technical presentation |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Crate boundaries and data flow |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | The 2-page architecture document (submission deliverable) |
+| [ARCHITECTURE-DETAIL.md](docs/ARCHITECTURE-DETAIL.md) | Crate boundaries, data flow and the limits, in full |
 | [DATASETS.md](docs/DATASETS.md) | Corpus provenance, coverage, named misses |
 | [THROUGHPUT.md](docs/THROUGHPUT.md) | Measured EPS, method, the limits found |
 | [FEATURE_TABLE.md](docs/FEATURE_TABLE.md) | The column contract for analytics and training |

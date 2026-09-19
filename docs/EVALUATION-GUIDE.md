@@ -545,7 +545,8 @@ your machine, the document is wrong and we want to know.
 | Document | Contents |
 |---|---|
 | [PROBLEM-STATEMENT.md](PROBLEM-STATEMENT.md) | PS 26156 read closely, clause by clause |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Crate boundaries and data flow |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | The 2-page architecture document |
+| [ARCHITECTURE-DETAIL.md](ARCHITECTURE-DETAIL.md) | Crate boundaries and data flow, in full |
 | [FEATURES.md](FEATURES.md) | Complete feature catalogue, mapped to requirements (a)–(k) |
 | [DATASETS.md](DATASETS.md) | Corpus provenance, coverage, named misses |
 | [DATASET-INVENTORY.md](DATASET-INVENTORY.md) | Every file, verified record count, origin |

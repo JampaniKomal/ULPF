@@ -26,7 +26,8 @@ SIH 2026 · Problem Statement 26156 · NTRO · Blockchain & Cybersecurity
 
 | Document | Contents |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Crate boundaries, data flow, and the limits |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | The 2-page architecture document (submission deliverable) |
+| [ARCHITECTURE-DETAIL.md](ARCHITECTURE-DETAIL.md) | Crate boundaries, data flow, and the limits, in full |
 | [PROOFS.md](PROOFS.md) | Proving one event was logged without disclosing the rest |
 | [PACK_GENERATOR.md](PACK_GENERATOR.md) | Clustering, the two generators, and how candidates are scored |
 | [UNKNOWN_LOG_ONBOARDING.md](UNKNOWN_LOG_ONBOARDING.md) | Evidence-based identification workflow for an unseen device |
@@ -42,13 +43,11 @@ SIH 2026 · Problem Statement 26156 · NTRO · Blockchain & Cybersecurity
 | [TESTING.md](TESTING.md) | Test strategy and what each layer catches |
 | [SECURITY-EVIDENCE.html](SECURITY-EVIDENCE.html) | The security case as a standalone page: six measured properties, each with the command that produced it |
 
-## Presentation
+## Demonstration
 
 | Document | Contents |
 |---|---|
 | [DEMO.md](DEMO.md) | The single-laptop demonstration, start to finish |
-| [DEMO-VIDEO-SCRIPT.md](DEMO-VIDEO-SCRIPT.md) | Shot list and narration |
-| [SLIDE-CONTENT.md](SLIDE-CONTENT.md) | Content for the five-slide technical presentation |
 
 ---
 
