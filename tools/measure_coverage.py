@@ -326,6 +326,12 @@ def main() -> None:
         # pack would hide from the check that exists to catch it. There is no
         # longer a tier exception, because there are no longer tiers - a corpus
         # is either measured or named as absent.
+        # A corpus outside the baseline has no figure to fall below, so its
+        # absence cannot hide a regression; CI deliberately skips the
+        # multi-gigabyte full corpora, which are measured by hand. A corpus that
+        # is in the baseline, or one that is on disk but failed, still blocks.
+        baselined = _baseline_names(pathlib.Path(args.baseline))
+        missing = [name for name in missing if name in baselined]
         if missing or failed:
             blocked = missing + failed
             print(
@@ -339,6 +345,13 @@ def main() -> None:
                 pathlib.Path(args.baseline), measured, total_pct, args.tolerance
             )
         )
+
+
+def _baseline_names(path):
+    """Corpus file names recorded in the baseline (empty if there is none)."""
+    if not path.exists():
+        return set()
+    return set(json.loads(path.read_text(encoding="utf-8")).get("per_corpus", {}))
 
 
 def write_baseline(path, measured, total_pct):
