@@ -2,6 +2,17 @@
 
 > SIH 2026 · Problem Statement 26156 · NTRO · Blockchain & Cybersecurity
 
+> [!NOTE]
+> **About this repository.** ULPF was built by a team of four for Smart India
+> Hackathon 2026: [@D3v4nshPat3l](https://github.com/D3v4nshPat3l),
+> [@JampaniKomal](https://github.com/JampaniKomal),
+> [@TheBhardwajRohit](https://github.com/TheBhardwajRohit) and
+> [@leatherm](https://github.com/leatherm). The team's repository is
+> [D3v4nshPat3l/ULPF](https://github.com/D3v4nshPat3l/ULPF). This copy carries
+> the full history of that work, and is where I, Jampani Komal, keep developing
+> ULPF as an open-source project. What changed here after 19 September 2026 is
+> under [Changes in this repository](#changes-in-this-repository).
+
 Any log in, OCSF out, nothing lost.
 
 ULPF ingests heterogeneous perimeter-security logs — firewalls, IDS/IPS,
@@ -70,12 +81,13 @@ The short version: build, then
 - [What is next](#what-is-next)
 - [Known limitations](#known-limitations)
 - [Development](#development)
+- [Changes in this repository](#changes-in-this-repository)
 
 ---
 
 ## The problem
 
-Security teams receives logs from dozens of vendors in mutually incompatible
+Security teams receive logs from dozens of vendors in mutually incompatible
 formats. Each new device usually means a hand-written parser. Worse, most
 normalization pipelines are lossy: they extract the fields someone thought of
 in advance and throw the rest away, severing the link between the tidy record
@@ -328,7 +340,7 @@ its JavaScript are compiled into the binary with `include_str!`.
 ### 1. Build
 
 ```bash
-git clone https://github.com/D3v4nshPat3l/ULPF.git
+git clone https://github.com/JampaniKomal/ULPF.git
 cd ULPF
 cargo build --release --locked
 ```
@@ -902,8 +914,27 @@ traffic, let the console draft a candidate for you and edit from there —
 
 ---
 
+## Changes in this repository
+
+Since the team's last commit (19 September 2026); details in
+[CHANGELOG.md](CHANGELOG.md).
+
+- **CI is green again.** The weekly coverage check had failed since
+  19 September without measuring anything: it demanded multi-gigabyte corpora
+  that the workflow deliberately does not download. It now requires exactly
+  the corpora its baseline records.
+- **A TLS vulnerability fixed:** rustls 0.23.43 -> 0.23.45
+  (RUSTSEC-2026-0285), used by the console's HTTPS modes.
+- **Demo stacks bound to loopback.** The Wazuh and OpenSearch demonstrations
+  run with default passwords or no authentication; their admin ports no longer
+  listen on every interface.
+- Links, code owners and the security policy point at this repository.
+
+---
+
 ## Licence and data
 
-The code in this repository is the team's own work. The log corpora are **not**
+The code in this repository is the ULPF team's own work, licensed under
+Apache-2.0 (see [LICENSE](LICENSE) and [NOTICE](NOTICE)). The log corpora are **not**
 redistributed here; `tools/fetch_datasets.py` retrieves them from the
 Honeynet Project and Loghub, whose terms apply to that data.

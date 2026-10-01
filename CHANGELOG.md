@@ -9,6 +9,31 @@ Figures quoted here are reproducible from the repository — see
 
 ## [Unreleased]
 
+### Since the team repository
+
+This copy continues [D3v4nshPat3l/ULPF](https://github.com/D3v4nshPat3l/ULPF)
+from its last commit (19 September 2026). Changes made here:
+
+- **The weekly coverage check had been red since 19 September** without
+  measuring anything. `--check` refused to run unless every corpus in the full
+  set was present, while the workflow deliberately skips the multi-gigabyte
+  full corpora (they do not fit on a runner). It now requires the corpora the
+  baseline records, which are exactly the ones CI fetches; a baselined corpus
+  that is missing, or any corpus that fails to measure, still blocks.
+- **rustls 0.23.43 -> 0.23.45** for RUSTSEC-2026-0285 (TLS 1.3 handshake
+  messages accepted across encryption-level boundaries), which affected the
+  console's `--tls-*` modes. `cargo audit` now reports no vulnerabilities; one
+  warning remains, `rustls-pemfile` being unmaintained, pulled in by
+  `axum-server` 0.7.
+- **Demo stacks listen on loopback.** The Wazuh and OpenSearch compose files
+  published their dashboard, API, indexer and agent ports on every interface,
+  with Wazuh's default passwords or (OpenSearch) no authentication at all. They
+  now bind to 127.0.0.1; the syslog ports stay open so devices can send.
+- Repository links, CODEOWNERS and the security-report route point at this
+  repository; the security policy no longer refers to a private repository
+  that does not exist; the documented test count is 405, which is what
+  `cargo test --workspace --release --locked` runs.
+
 ### Ingest and preservation
 
 - Append-only zstd raw vault: byte-exact, CRC-verified, indexed retrieval by

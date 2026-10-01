@@ -69,7 +69,7 @@ one we tested; it cannot silently resolve to something else.
 cargo test --workspace --release --locked
 ```
 
-Expect **401 tests passed, 0 failed**.
+Expect **405 tests passed, 0 failed**.
 
 ### 3. Score every parser against its own fixtures
 
@@ -524,7 +524,7 @@ Stated plainly, because you will find it anyway.
 | Claim | Command |
 |---|---|
 | 35 packs, 78/78 fixtures, 100% field accuracy | `ulpf test --packs packs` |
-| 401 tests pass | `cargo test --workspace --release --locked` |
+| 405 tests pass | `cargo test --workspace --release --locked` |
 | 0 enum problems across 35 packs | `python tools/audit_pack_enums.py` |
 | 32,414,250 records at 99.8967% | `python tools/measure_coverage.py --set perimeter` |
 | UDP throughput and its losses | `python tools/measure_throughput.py` |

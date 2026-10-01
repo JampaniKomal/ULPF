@@ -107,7 +107,7 @@ An evaluator will find these anyway, so we state them.
 
 ```bash
 cargo build --release --locked          # ~3 min
-cargo test --workspace --release --locked   # 401 tests
+cargo test --workspace --release --locked   # 405 tests
 ./target/release/ulpf test --packs packs    # 35 packs, 78/78 fixtures
 python tools/audit_pack_enums.py            # 0 problems
 python tools/fetch_datasets.py              # 5.6 GB

@@ -6,9 +6,9 @@ Security fixes are applied to `main` while ULPF is pre-1.0. Tagged releases may 
 
 ## Reporting a vulnerability
 
-Do not open a public issue for a vulnerability. Use GitHub’s private vulnerability reporting feature after the private repository is created, or contact the repository owner through the team’s approved private channel. Include the affected commit, impact, reproduction, and any proposed mitigation. Do not include real credentials or sensitive operational logs.
+Do not open a public issue for a vulnerability. Report it privately through GitHub's private vulnerability reporting (the repository's Security tab, then Report a vulnerability). If that option is not shown, open an issue that asks for a private contact and contains no details. Include the affected commit, impact, reproduction, and any proposed mitigation. Do not include real credentials or sensitive operational logs.
 
-The team will acknowledge a complete report within three working days and provide status within seven working days.
+The maintainer will acknowledge a complete report within three working days and provide status within seven working days.
 
 ## Deployment guidance
 

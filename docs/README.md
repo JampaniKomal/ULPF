@@ -60,7 +60,7 @@ project reports a number that one of these does not print.
 | Claim | Command |
 |---|---|
 | 35 packs, 78/78 fixtures, 100% field accuracy | `ulpf test --packs packs` |
-| 401 tests pass | `cargo test --workspace --release --locked` |
+| 405 tests pass | `cargo test --workspace --release --locked` |
 | 0 enum problems across 35 packs | `python tools/audit_pack_enums.py` |
 | 32,414,250 real records at 99.8967% | `python tools/measure_coverage.py --set perimeter` |
 | Tamper detection | `ulpf verify` on an altered stream |

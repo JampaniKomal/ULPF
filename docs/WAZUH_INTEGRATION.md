@@ -127,7 +127,7 @@ the UDP listener and archive pipeline already configured.
 
 ```powershell
 Set-Location "E:\"
-git clone https://github.com/D3v4nshPat3l/ULPF.git ULPF
+git clone https://github.com/JampaniKomal/ULPF.git ULPF
 Set-Location "E:\ULPF\deploy\wazuh"
 ```
 

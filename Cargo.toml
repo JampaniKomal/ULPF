@@ -15,7 +15,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.85"
 license = "Apache-2.0"
-repository = "https://github.com/D3v4nshPat3l/ULPF"
+repository = "https://github.com/JampaniKomal/ULPF"
 authors = ["ULPF Team — SIH 2026 · PS 26156"]
 
 [workspace.dependencies]
