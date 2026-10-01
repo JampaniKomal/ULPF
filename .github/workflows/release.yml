@@ -1,0 +1,101 @@
+name: Release
+
+# Builds the `ulpf` binary for Linux and Windows and, for a `v*` tag, publishes
+# them as a GitHub release. Each archive holds the binary plus the Source Packs
+# it needs at runtime (`--packs packs`); the console is compiled in.
+#
+# Run it by hand (workflow_dispatch) to build the archives without releasing.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 22.04 rather than latest: the binary links against glibc, and an
+          # older one runs on more distributions.
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu, archive: tar.gz }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, archive: zip }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked --bin ulpf
+
+      - name: Score the Source Pack fixtures with the built binary
+        shell: bash
+        run: |
+          exe=target/release/ulpf
+          [ -f "$exe.exe" ] && exe="$exe.exe"
+          "$exe" test --packs packs
+
+      - name: Package
+        id: package
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME}"
+          [[ "$version" == v* ]] || version="dev-${GITHUB_SHA::7}"
+          name="ulpf-${version}-${{ matrix.target }}"
+          mkdir -p "dist/$name"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp target/release/ulpf.exe "dist/$name/"
+          else
+            cp target/release/ulpf "dist/$name/"
+          fi
+          cp -r packs LICENSE NOTICE README.md CHANGELOG.md "dist/$name/"
+          cd dist
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            7z a -bso0 "$name.zip" "$name"
+            echo "file=$name.zip" >> "$GITHUB_OUTPUT"
+          else
+            tar czf "$name.tar.gz" "$name"
+            echo "file=$name.tar.gz" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}
+          path: dist/${{ steps.package.outputs.file }}
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "ULPF $GITHUB_REF_NAME" \
+            --notes-file .github/release-notes.md
